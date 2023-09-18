@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>order &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">order</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for order</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Jun 19 18:16:26 2023</span>
+
+<span class="sd">@author: hjammoul</span>
+<span class="sd">Ordering &amp; distance computation is here</span>
+
+<span class="sd">Ordering_fct_inf &amp; Ordering_fct_sup have the same implementation but different philosophies (WaW)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="c1">#####################################################################</span>
+<span class="k">def</span> <span class="nf">compute_distance_lab_img</span><span class="p">(</span><span class="n">image1</span><span class="p">,</span> <span class="n">image2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Euclidean distance map between pixels of two images in CIELAB color space.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        image1 (ndarray): The first image.</span>
+<span class="sd">        image2 (ndarray): The second image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: The distance map, representing the Euclidean distances between the pixels of the two images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image1</span> <span class="o">=</span> <span class="n">image1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">image2</span> <span class="o">=</span> <span class="n">image2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Compute the Euclidean distances between the pixels of the two images</span>
+    <span class="n">distance_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">image1</span> <span class="o">-</span> <span class="n">image2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance_map</span>
+<div class="viewcode-block" id="compute_distance_map"><a class="viewcode-back" href="../order.html#order.compute_distance_map">[docs]</a><span class="k">def</span> <span class="nf">compute_distance_map</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">ref_A</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the distance map between the pixels of a displaced mask and a reference point in CIELAB color space.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        displaced_mask (ndarray): The mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</span>
+<span class="sd">        ref_A (ndarray): The LAB coordinates of the reference point O+ or O- (shape: (3,)).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: The distance map, representing the Euclidean distances between each pixel and the reference point.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Reshape the displaced mask to a 2D array of shape (num_pixels, 3)</span>
+    <span class="n">ref_A_2d</span> <span class="o">=</span> <span class="n">ref_A</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="c1">## transform the cube into a 2D array (nblg xnbcol, 3)</span>
+    <span class="c1"># Compute the distance between each pixel and ref_A</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">ref_A_2d</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="c1"># Reshape the distance array to match the original mask shape</span>
+    <span class="n">distance_map</span> <span class="o">=</span> <span class="n">distances</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">distance_map</span></div>
+
+
+<span class="c1">###NEW ordering function these will only compare to O- and O+</span>
+<div class="viewcode-block" id="ordering_fct_inf"><a class="viewcode-back" href="../order.html#order.ordering_fct_inf">[docs]</a><span class="k">def</span> <span class="nf">ordering_fct_inf</span><span class="p">(</span><span class="n">distamp_inf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the pixel index having the closest point O- based on a given distance map.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        distamp_inf (numpy.ndarray): Distance map of the displaced mask&#39;s inferior pixels to the reference point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Index (row, column) of the chosen pixel in the `g_inf` array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">distamp_inf</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">distamp_inf</span><span class="p">))</span>
+    <span class="n">chosen_index</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sorted_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">chosen_index</span></div>
+<div class="viewcode-block" id="ordering_fct_sup"><a class="viewcode-back" href="../order.html#order.ordering_fct_sup">[docs]</a><span class="k">def</span> <span class="nf">ordering_fct_sup</span><span class="p">(</span><span class="n">distamp_sup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the pixel index having the closest point O+ based on a given distance map.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        distamp_sup (numpy.ndarray): Distance map of the displaced mask&#39;s superior pixels to the reference point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Index (row, column) of the chosen pixel in the `g_sup` array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#discard NaN values positions</span>
+    <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">distamp_sup</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">distamp_sup</span><span class="p">))</span>
+    <span class="n">chosen_index</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">sorted_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">chosen_index</span></div>
+
+<span class="c1">##########CRA ordering</span>
+
+<div class="viewcode-block" id="cra_sup"><a class="viewcode-back" href="../order.html#order.cra_sup">[docs]</a><span class="k">def</span> <span class="nf">cra_sup</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the pixel index with the maximum g(Ci) value based on CRA ordering for superior pixels.</span>
+<span class="sd">    </span>
+<span class="sd">    Rational:</span>
+<span class="sd">        Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps</span>
+<span class="sd">        use them to compute g(Ci) array </span>
+<span class="sd">        g(Ci) = d(O-,Ci)/d(O+,Ci)</span>
+<span class="sd">        g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH</span>
+<span class="sd">        g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH</span>
+<span class="sd">        particular cases:</span>
+<span class="sd">        Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+</span>
+<span class="sd">        Minimum: g(Ci)=0 =&gt; Ci is equal to O-</span>
+<span class="sd">        Find maximum:</span>
+<span class="sd">        In g(Ci) array, if at a certain position there is inf/nan, return its indices.</span>
+<span class="sd">        Otherwise, return the position of the minimum g value.</span>
+<span class="sd">        </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        displaced_mask (ndarray): Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</span>
+<span class="sd">        O_sup_lab (ndarray): LAB coordinates of the upper convergence point (O+) (shape: (3,)).</span>
+<span class="sd">        O_inf_lab (ndarray): LAB coordinates of the lower convergence point (O-) (shape: (3,)).</span>
+<span class="sd">        nan_mask (ndarray): Mask indicating NaN values (shape: (se_size, se_size, 1)).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Index (row, column) of the chosen pixel for superior convergence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Reshape the displaced mask to a 2D array of shape (num_pixels, 3)</span>
+    <span class="n">O_sup_lab</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">O_inf_lab</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="c1"># Compute the distance between each pixel and O_sup_lab and O_inf_lab</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Reshape the distance arrays to match the original mask shape</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">distances_to_O_sup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="c1"># Compute g(Ci) array</span>
+    <span class="n">g_values</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span> <span class="o">/</span> <span class="n">distances_to_O_sup</span>
+    
+    <span class="c1"># Check if a certain element of the g_values is nan/inf</span>
+    <span class="n">nan_inf_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">g_values</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">g_values</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Return the indices of the first nan/inf value found this is O+</span>
+        <span class="k">return</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Discard positions in g_values where nan_mask is False</span>
+        <span class="n">g_values</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># Find the minimum index in g_values</span>
+        <span class="n">max_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="n">g_values</span><span class="p">),</span> <span class="n">g_values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_index</span></div>
+ 
+<div class="viewcode-block" id="cra_inf"><a class="viewcode-back" href="../order.html#order.cra_inf">[docs]</a><span class="k">def</span> <span class="nf">cra_inf</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the pixel index with the minimum g(Ci) value based on CRA ordering for inferior pixels.</span>
+<span class="sd">    </span>
+<span class="sd">    Rational:</span>
+<span class="sd">        Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps</span>
+<span class="sd">        use them to compute g(Ci) array </span>
+<span class="sd">        g(Ci) = d(O-,Ci)/d(O+,Ci)</span>
+<span class="sd">        g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH</span>
+<span class="sd">        g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH</span>
+<span class="sd">        particular cases:</span>
+<span class="sd">        Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+</span>
+<span class="sd">        Minimum: g(Ci)=0 =&gt; Ci is equal to O-</span>
+<span class="sd">        Find maximum:</span>
+<span class="sd">        In g(Ci) array, if at a certain position there is inf/nan, return its indices.</span>
+<span class="sd">        Otherwise, return the position of the minimum g value.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        displaced_mask (ndarray): Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</span>
+<span class="sd">        O_sup_lab (ndarray): LAB coordinates of the upper convergence point (O+) (shape: (3,)).</span>
+<span class="sd">        O_inf_lab (ndarray): LAB coordinates of the lower convergence point (O-) (shape: (3,)).</span>
+<span class="sd">        nan_mask (ndarray): Mask indicating NaN values (shape: (se_size, se_size, 1)).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: Index (row, column) of the chosen pixel for inferior convergence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Reshape the displaced mask to a 2D array of shape (num_pixels, 3)</span>
+    <span class="n">O_sup_lab</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">O_inf_lab</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="c1"># Compute the distance between each pixel and O_sup_lab and O_inf_lab</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Reshape the distance arrays to match the original mask shape</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">distances_to_O_sup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="c1"># Compute g(Ci) array</span>
+    <span class="n">g_values</span> <span class="o">=</span>  <span class="n">distances_to_O_sup</span> <span class="o">/</span> <span class="n">distances_to_O_inf</span>
+    <span class="c1"># plt.figure(figsize=(12, 8))</span>
+    <span class="c1"># plt.imshow(g_values)</span>
+    <span class="c1"># plt.title(&quot;g_values&quot;)</span>
+    <span class="c1"># plt.show()</span>
+    <span class="c1"># Check if a certain element of the g_values is nan/inf</span>
+    <span class="n">nan_inf_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">g_values</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">g_values</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Return the indices of the first nan/inf value found this is O+</span>
+        <span class="k">return</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Discard positions in g_values where nan_mask is False</span>
+        <span class="n">g_values</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># Find the minimum index in g_values</span>
+        <span class="n">max_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmax</span><span class="p">(</span><span class="n">g_values</span><span class="p">),</span> <span class="n">g_values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">max_index</span>
+  
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rational:</span>
+<span class="sd">        Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps</span>
+<span class="sd">        use them to compute g(Ci) array </span>
+<span class="sd">        g(Ci) = d(O-,Ci)/d(O+,Ci)</span>
+<span class="sd">        g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH</span>
+<span class="sd">        g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH</span>
+<span class="sd">        particular cases:</span>
+<span class="sd">        Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+</span>
+<span class="sd">        Minimum: g(Ci)=0 =&gt; Ci is equal to O-</span>
+<span class="sd">        Find maximum:</span>
+<span class="sd">        In g(Ci) array, if at a certain position there is inf/nan, return its indices.</span>
+<span class="sd">        Otherwise, return the position of the minimum g value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Reshape the displaced mask to a 2D array of shape (num_pixels, 3)</span>
+    <span class="n">O_sup_lab</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">O_inf_lab</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    
+    <span class="c1"># Compute the distance between each pixel and O_sup_lab and O_inf_lab</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Reshape the distance arrays to match the original mask shape</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">distances_to_O_sup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="c1"># Compute g(Ci) array</span>
+    <span class="n">g_values</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span> <span class="o">/</span> <span class="n">distances_to_O_sup</span>
+    <span class="c1"># Check if a certain element of the g_values is null</span>
+    <span class="c1"># Return the indices of the first null value found</span>
+    <span class="n">null_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">distances_to_O_inf</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">nan_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">null_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">null_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">null_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Discard positions in g_values where nan_mask is False</span>
+        <span class="n">g_values</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># Find the minimum index in g_values</span>
+        <span class="n">min_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmin</span><span class="p">(</span><span class="n">g_values</span><span class="p">),</span> <span class="n">g_values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">min_index</span></div>
+    
+<div class="viewcode-block" id="compute_distance_lab_img"><a class="viewcode-back" href="../order.html#order.compute_distance_lab_img">[docs]</a><span class="k">def</span> <span class="nf">compute_distance_lab_img</span><span class="p">(</span><span class="n">image1</span><span class="p">,</span> <span class="n">image2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Euclidean distance map between pixels of two images in CIELAB color space.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        image1 (ndarray): The first image.</span>
+<span class="sd">        image2 (ndarray): The second image.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: The distance map, representing the Euclidean distances between the pixels of the two images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image1</span> <span class="o">=</span> <span class="n">image1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">image2</span> <span class="o">=</span> <span class="n">image2</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Compute the Euclidean distances between the pixels of the two images</span>
+    <span class="n">distance_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">image1</span> <span class="o">-</span> <span class="n">image2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">distance_map</span></div>
+
+<div class="viewcode-block" id="cra_median"><a class="viewcode-back" href="../order.html#order.cra_median">[docs]</a><span class="k">def</span> <span class="nf">cra_median</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Calculate the pixel index with the median g(Ci) value based on CRA ordering.</span>
+<span class="sd">    </span>
+<span class="sd">        Rational:</span>
+<span class="sd">            Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps</span>
+<span class="sd">            use them to compute g(Ci) array </span>
+<span class="sd">            g(Ci) = d(O-,Ci)/d(O+,Ci)</span>
+<span class="sd">            g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH</span>
+<span class="sd">            g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH</span>
+<span class="sd">            particular cases:</span>
+<span class="sd">            Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+</span>
+<span class="sd">            Minimum: g(Ci)=0 =&gt; Ci is equal to O-</span>
+<span class="sd">            Find median:</span>
+<span class="sd">            In g(Ci) array, calculate the median value and find the index of the pixel with the closest g value to the median.</span>
+<span class="sd">            Return the index of the pixel with the closest g value to the median.</span>
+<span class="sd">    </span>
+<span class="sd">     Parameters:</span>
+<span class="sd">         displaced_mask (ndarray): Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</span>
+<span class="sd">         O_sup_lab (ndarray): LAB coordinates of the upper convergence point (O+) (shape: (3,)).</span>
+<span class="sd">         O_inf_lab (ndarray): LAB coordinates of the lower convergence point (O-) (shape: (3,)).</span>
+<span class="sd">         nan_mask (ndarray): Mask indicating NaN values (shape: (se_size, se_size, 1)).</span>
+<span class="sd">    </span>
+<span class="sd">     Returns:</span>
+<span class="sd">         tuple: Index (row, column) of the chosen pixel for median convergence.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="c1">#print(&quot;pixels:&quot;,displaced_mask)</span>
+    <span class="c1"># Reshape the displaced mask to a 2D array of shape (num_pixels, 3)</span>
+    <span class="n">O_sup_lab</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">O_inf_lab</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">pixels</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="c1"># Compute the distance between each pixel and O_sup_lab and O_inf_lab</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+    
+    <span class="c1"># Reshape the distance arrays to match the original mask shape</span>
+    <span class="n">distances_to_O_sup</span> <span class="o">=</span> <span class="n">distances_to_O_sup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">distances_to_O_inf</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">displaced_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="c1"># Compute g(Ci) array</span>
+    <span class="n">g_values</span> <span class="o">=</span> <span class="n">distances_to_O_inf</span> <span class="o">/</span> <span class="n">distances_to_O_sup</span>
+    <span class="c1">#nan_mask: true where value is not nan</span>
+    <span class="c1"># Check if a certain element of the g_values is nan/inf</span>
+    <span class="n">nan_inf_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">g_values</span><span class="p">)</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">g_values</span><span class="p">))</span> <span class="o">&amp;</span> <span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Return the indices of the first nan/inf value found this is O+</span>
+        <span class="k">return</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">nan_inf_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Discard positions in g_values where nan_mask is False</span>
+        <span class="n">g_values</span><span class="p">[</span><span class="o">~</span><span class="n">nan_mask</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1">#print(&quot;g_values inside median ordering:&quot;,g_values)</span>
+        <span class="c1"># Calculate the median value of g_values</span>
+        <span class="n">median_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">g_values</span><span class="p">)</span>
+        <span class="c1">#print(&quot;median g-value:&quot;,median_value)</span>
+        <span class="c1"># Find the index of the pixel with the closest g value to the median</span>
+        <span class="n">median_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanargmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">g_values</span> <span class="o">-</span> <span class="n">median_value</span><span class="p">)),</span> <span class="n">g_values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">median_index</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

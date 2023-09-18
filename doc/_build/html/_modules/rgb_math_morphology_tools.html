@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rgb_math_morphology_tools &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rgb_math_morphology_tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rgb_math_morphology_tools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Jul  3 13:01:28 2023</span>
+
+<span class="sd">@author: hjammoul</span>
+<span class="sd">RGB_MorphoMath_tools</span>
+<span class="sd">Dilation &amp; erosion_rgb perform ordering usuch as lower is closest to O- and higher closest to O+</span>
+<span class="sd">CRA_dilation and erosion (allow idempotence &amp; duality) perform ordering based on both convergence coordinates</span>
+<span class="sd">opening &amp; closing</span>
+<span class="sd">Extension_of_convergence_points: choose ur colors and it makes them more distant to prevent saturation </span>
+<span class="sd">and ensure the transformations are increasing</span>
+<span class="sd">Ensure_convegence: to prevent divergence and thus ensure the tansformations are increasing</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">order</span> <span class="kn">import</span> <span class="n">compute_distance_map</span><span class="p">,</span> <span class="n">ordering_fct_inf</span><span class="p">,</span><span class="n">ordering_fct_sup</span><span class="p">,</span><span class="n">cra_sup</span><span class="p">,</span> <span class="n">cra_inf</span><span class="p">,</span> <span class="n">compute_distance_lab_img</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+<span class="c1">###########################################################</span>
+
+<div class="viewcode-block" id="erosion_rgb"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.erosion_rgb">[docs]</a><span class="k">def</span> <span class="nf">erosion_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs erosion on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">    Erosion is a morphological operation that shrinks the shapes in an image by considering the local neighborhood</span>
+<span class="sd">    around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the</span>
+<span class="sd">    minimum values of the pixel colors within the SE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The eroded image after applying the erosion operation in LAB space.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; img_lab = np.array(...)  # Replace with your LAB image</span>
+<span class="sd">    &gt;&gt;&gt; se_lab = np.array(...)   # Replace with your LAB SE</span>
+<span class="sd">    &gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])</span>
+<span class="sd">    &gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])</span>
+<span class="sd">    &gt;&gt;&gt; eroded_image = erosion_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</span>
+<span class="sd">     # Now &#39;eroded_image&#39; contains the result of the erosion operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#distance between convergence points</span>
+    <span class="n">distance_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="c1"># Define the padding size, se shape is always impaire</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">se_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># Compute the eroded image size</span>
+    <span class="n">eroded_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">eroded_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">eroded_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> 
+    <span class="c1"># Apply erosion on each pixel in the image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+            <span class="c1"># Consider the surrounding mask around the pixel</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">img_lab</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">mask_size</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Create a mask of NaN values, true where value is not NaN</span>
+            <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">se_lab</span><span class="p">))</span>
+            <span class="c1">##if mask contains O_inf value=&gt;just take its index in min_dist_idx</span>
+            <span class="c1"># Check if O_inf_lab exists in mask[nan_mask, :]</span>
+            <span class="n">O_inf_exists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">O_inf_exists</span><span class="p">:</span>
+                <span class="c1">##the condtion may be always true!!!!!!</span>
+                <span class="n">min_dist_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span>  <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">O_inf_lab</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">displaced_mask</span><span class="p">[</span><span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">O_inf_lab</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Compute the displacement vector from x to O_inf: vector CO-</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="c1"># Normalize the displacement vector: ensembe of vectors(vecteur directeur de deplacement) for each pixel:</span>
+                <span class="n">normalized_displacement</span> <span class="o">=</span> <span class="n">displacement_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacement_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+                <span class="c1">#print(&quot;shape normalized_displacement&quot;,normalized_displacement.shape)</span>
+                <span class="c1">#print(&quot; nan values in normalized_displacement&quot;,np.isnan(normalized_displacement[:,:,0]))</span>
+                <span class="c1"># Compute the displacement value SE * normalized_displacement = E * vector(C, O_inf)</span>
+                <span class="c1">##magnitudes of se_lab along axis 2</span>
+                <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">se_lab</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">se_magnitude_reshaped</span> <span class="o">=</span> <span class="n">se_magnitude</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_displacement</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_magnitude_reshaped</span><span class="p">)</span>
+                <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">mask</span>
+                <span class="c1">#Ensure non-divergence from convergence  point</span>
+                <span class="c1"># Clip the values in displaced_mask to ensure they are within the range of O_inf_lab and O_sup_lab</span>
+                <span class="n">displaced_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">)</span>
+                <span class="c1">##Compute the distance map of the displaced mask&#39;s pixels to O_inf</span>
+                <span class="n">dist_map_to_O_inf</span> <span class="o">=</span> <span class="n">compute_distance_map</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+                <span class="c1">##in the dist map put NaNs in the positions where nan_mask is false</span>
+                <span class="n">min_dist_idx</span> <span class="o">=</span> <span class="n">ordering_fct_inf</span><span class="p">(</span><span class="n">dist_map_to_O_inf</span><span class="p">)</span>
+            <span class="c1"># Update the eroded image with the chosen pixel value</span>
+            <span class="n">eroded_image</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="p">[</span><span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+    <span class="c1">#eroded_image_rgb = color.lab2rgb(eroded_image, illuminant=&#39;D65&#39;)</span>
+    <span class="k">return</span> <span class="n">eroded_image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="dilation_rgb"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.dilation_rgb">[docs]</a><span class="k">def</span> <span class="nf">dilation_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs dilation on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">    Dilation is a morphological operation that expands the shapes in an image by considering the local neighborhood</span>
+<span class="sd">    around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the</span>
+<span class="sd">    maximum values of the pixel colors within the SE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The dilated image after applying the dilation operation in LAB space.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; img_lab = np.array(...)  # Replace with your LAB image</span>
+<span class="sd">    &gt;&gt;&gt; se_lab = np.array(...)   # Replace with your LAB SE</span>
+<span class="sd">    &gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])</span>
+<span class="sd">    &gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])</span>
+<span class="sd">    &gt;&gt;&gt; dilated_image = dilation_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</span>
+<span class="sd">     # Now &#39;dilated_image&#39; contains the result of the dilation operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert RGB image to Lab color space using illuminant D65</span>
+    <span class="n">distance_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="c1"># Define the padding size</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">se_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># Compute the eroded image size</span>
+    <span class="n">dilated_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="c1"># Create an empty eroded image</span>
+    <span class="n">dilated_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dilated_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Apply erosion on each pixel in the image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span> <span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+            <span class="c1"># Consider the surrounding mask around the pixel</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">img_lab</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">mask_size</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Create a mask of NaN values</span>
+            <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">se_lab</span><span class="p">))</span>
+            <span class="c1">##if mask contains O_inf value=&gt;just take its index in min_dist_idx</span>
+            <span class="c1"># Check if O_inf_lab exists in mask[nan_mask, :]</span>
+            <span class="n">O_sup_exists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1">#print(np.ceil(mask[nan_mask[:,:,0],:]))</span>
+            <span class="k">if</span> <span class="n">O_sup_exists</span><span class="p">:</span>
+                <span class="c1">#for this to work O_sup_lab needs to be part of CIE lab</span>
+                <span class="n">max_dist_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span>  <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">O_sup_lab</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">displaced_mask</span><span class="p">[</span><span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">O_sup_lab</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Compute the displacement vector from x to O_inf</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="c1">#print(mask)</span>
+                <span class="c1"># Normalize the displacement vector: ensembe of vectors for each pixel: shape:(31,31,3)</span>
+                <span class="n">normalized_displacement</span> <span class="o">=</span> <span class="n">displacement_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacement_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Compute the displacement value SE * normalized_displacement = E * vector(C, O_inf)</span>
+                <span class="c1"># ##magnitudes of se_lab along axis 2</span>
+                <span class="c1"># Compute the magnitude of se_lab, handling NaN values</span>
+                <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">se_lab</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">se_magnitude_reshaped</span> <span class="o">=</span> <span class="n">se_magnitude</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_displacement</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_magnitude_reshaped</span><span class="p">)</span>
+                <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">mask</span>
+                <span class="c1"># Clip the values in displaced_mask to ensure they are within the range of O_inf_lab and O_sup_lab</span>
+                <span class="c1">#displaced_mask[:, :, 0] = np.clip(displaced_mask[:, :, 0], -0., 100.) #To ensure convergence(prevent divergence)</span>
+                <span class="c1">#Compute distance maps and do the ordering to </span>
+                <span class="n">dist_map_to_O_sup</span> <span class="o">=</span> <span class="n">compute_distance_map</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+                <span class="n">max_dist_idx</span> <span class="o">=</span>  <span class="n">ordering_fct_sup</span><span class="p">(</span><span class="n">dist_map_to_O_sup</span><span class="p">)</span>
+                <span class="c1"># Update the eroded image with the chosen pixel value</span>
+            <span class="n">dilated_image</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="p">[</span><span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">dilated_image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cra_erosion_rgb"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.cra_erosion_rgb">[docs]</a><span class="k">def</span> <span class="nf">cra_erosion_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs erosion on an RGB image using a structuring element (SE). Ordering based on CRA</span>
+
+<span class="sd">    Erosion is a morphological operation that shrinks the shapes in an image by considering the local neighborhood</span>
+<span class="sd">    around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the</span>
+<span class="sd">    minimum values of the pixel colors within the SE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The eroded image after applying the erosion operation in LAB space.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; img_lab = np.array(...)  # Replace with your LAB image</span>
+<span class="sd">    &gt;&gt;&gt; se_lab = np.array(...)   # Replace with your LAB SE</span>
+<span class="sd">    &gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])</span>
+<span class="sd">    &gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])</span>
+<span class="sd">    &gt;&gt;&gt; eroded_image = erosion_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</span>
+<span class="sd">     # Now &#39;eroded_image&#39; contains the result of the erosion operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#distance between convergence points</span>
+    <span class="n">distance_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="c1"># Define the padding size, se shape is always impaire</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">se_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># Compute the eroded image size</span>
+    <span class="n">eroded_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">eroded_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">eroded_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> 
+    <span class="c1"># Apply erosion on each pixel in the image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+            <span class="c1"># Consider the surrounding mask around the pixel</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">img_lab</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">mask_size</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Create a mask of NaN values, true where value is not NaN</span>
+            <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">se_lab</span><span class="p">))</span>
+            <span class="c1">##if mask contains O_inf value=&gt;just take its index in min_dist_idx</span>
+            <span class="c1"># Check if O_inf_lab exists in mask[nan_mask, :]</span>
+            <span class="n">O_inf_exists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">O_inf_exists</span><span class="p">:</span>
+                <span class="c1">##the condtion may be always true!!!!!!</span>
+                <span class="n">min_dist_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span>  <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">O_inf_lab</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">displaced_mask</span><span class="p">[</span><span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">O_inf_lab</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Compute the displacement vector from x to O_inf: vector CO-</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="c1"># Normalize the displacement vector: ensembe of vectors(vecteur directeur de deplacement) for each pixel:</span>
+                <span class="n">normalized_displacement</span> <span class="o">=</span> <span class="n">displacement_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacement_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+                <span class="c1">#print(&quot;shape normalized_displacement&quot;,normalized_displacement.shape)</span>
+                <span class="c1">#print(&quot; nan values in normalized_displacement&quot;,np.isnan(normalized_displacement[:,:,0]))</span>
+                <span class="c1"># Compute the displacement value SE * normalized_displacement = E * vector(C, O_inf)</span>
+                <span class="c1">##magnitudes of se_lab along axis 2</span>
+                <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">se_lab</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">se_magnitude_reshaped</span> <span class="o">=</span> <span class="n">se_magnitude</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_displacement</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_magnitude_reshaped</span><span class="p">)</span>
+                <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">mask</span>
+                <span class="c1">##in the dist map put NaNs in the positions where nan_mask is false</span>
+                <span class="n">min_dist_idx</span> <span class="o">=</span> <span class="n">cra_inf</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">)</span>
+            <span class="c1"># Update the eroded image with the chosen pixel value</span>
+            <span class="n">eroded_image</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="p">[</span><span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">eroded_image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="cra_dilation_rgb"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.cra_dilation_rgb">[docs]</a><span class="k">def</span> <span class="nf">cra_dilation_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs dilation on an RGB image using a structuring element (SE). Performs erosion on an RGB image using a structuring element (SE). Ordering based on CRA</span>
+
+<span class="sd">    Dilation is a morphological operation that expands the shapes in an image by considering the local neighborhood</span>
+<span class="sd">    around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the</span>
+<span class="sd">    maximum values of the pixel colors within the SE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The dilated image after applying the dilation operation in LAB space.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt;&gt; img_lab = np.array(...)  # Replace with your LAB image</span>
+<span class="sd">    &gt;&gt;&gt; se_lab = np.array(...)   # Replace with your LAB SE</span>
+<span class="sd">    &gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])</span>
+<span class="sd">    &gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])</span>
+<span class="sd">    &gt;&gt;&gt; dilated_image = dilation_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</span>
+<span class="sd">     # Now &#39;dilated_image&#39; contains the result of the dilation operation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert RGB image to Lab color space using illuminant D65</span>
+    <span class="n">distance_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="c1"># Define the padding size</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">se_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># Compute the eroded image size</span>
+    <span class="n">dilated_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="c1"># Create an empty eroded image</span>
+    <span class="n">dilated_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dilated_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Apply erosion on each pixel in the image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span> <span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+            <span class="c1"># Consider the surrounding mask around the pixel</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">img_lab</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">mask_size</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Create a mask of NaN values</span>
+            <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">se_lab</span><span class="p">))</span>
+            <span class="c1">##if mask contains O_inf value=&gt;just take its index in min_dist_idx</span>
+            <span class="c1"># Check if O_inf_lab exists in mask[nan_mask, :]</span>
+            <span class="n">O_sup_exists</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="c1">#print(np.ceil(mask[nan_mask[:,:,0],:]))</span>
+            <span class="k">if</span> <span class="n">O_sup_exists</span><span class="p">:</span>
+                <span class="c1">#for this to work O_sup_lab needs to be part of CIE lab</span>
+                <span class="n">max_dist_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">==</span>  <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">O_sup_lab</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">displaced_mask</span><span class="p">[</span><span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">O_sup_lab</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Compute the displacement vector from x to O_inf</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">O_sup_lab</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="c1"># Normalize the displacement vector: ensembe of vectors for each pixel: shape:(31,31,3)</span>
+                <span class="n">normalized_displacement</span> <span class="o">=</span> <span class="n">displacement_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacement_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Compute the displacement value SE * normalized_displacement = E * vector(C, O_inf)</span>
+                <span class="c1"># ##magnitudes of se_lab along axis 2</span>
+                <span class="c1"># Compute the magnitude of se_lab, handling NaN values</span>
+                <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">se_lab</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">se_magnitude_reshaped</span> <span class="o">=</span> <span class="n">se_magnitude</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_displacement</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_magnitude_reshaped</span><span class="p">)</span>
+                <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">mask</span>
+                <span class="c1">#Compute distance maps and do the ordering to </span>
+                <span class="n">max_dist_idx</span> <span class="o">=</span> <span class="n">CRA_sup</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">)</span>
+                <span class="c1"># Update the eroded image with the chosen pixel value</span>
+            <span class="n">dilated_image</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="p">[</span><span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">dilated_image</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="cra_anti_dilation_rgb"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.cra_anti_dilation_rgb">[docs]</a><span class="k">def</span> <span class="nf">cra_anti_dilation_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs Anti-dilation on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">    Anti-dilation is a morphological operation that dilates towards the O- color convergence point the shapes in an image by considering the local neighborhood</span>
+<span class="sd">    around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the</span>
+<span class="sd">    maximum values of the pixel colors within the SE, displacing the colors towards O- (black).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space (dtype: float32).</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space (dtype: float32).</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: The anti-dilated image after applying the anti-dilation operation in LAB space (dtype: float32).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#distance between convergence points</span>
+    <span class="n">distance_ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="c1"># Define the padding size, se shape is always impaire</span>
+    <span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">se_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="c1"># Compute the eroded image size</span>
+    <span class="n">anti_dilated_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">pad_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">anti_dilated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">anti_dilated_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> 
+    <span class="c1"># Apply erosion on each pixel in the image</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pad_size</span><span class="p">,</span> <span class="n">img_lab</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">):</span>
+            <span class="c1"># Consider the surrounding mask around the pixel</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">img_lab</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="n">pad_size</span><span class="p">:</span> <span class="n">j</span> <span class="o">+</span> <span class="n">pad_size</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span>
+            <span class="n">mask_size</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Create a mask of NaN values, true where value is not NaN</span>
+            <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">invert</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">se_lab</span><span class="p">))</span>
+            <span class="c1">##if mask contains O_inf value=&gt;just take its index in min_dist_idx</span>
+            <span class="c1"># Check if O_inf_lab exists in mask[nan_mask, :] : discard it, I want the max</span>
+            <span class="n">nan_mask</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># Compute the displacement vector from x to O_inf: vector CO-</span>
+            <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">O_inf_lab</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">-</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="c1"># Normalize the displacement vector: ensembe of vectors(vecteur directeur de deplacement) for each pixel:</span>
+            <span class="n">normalized_displacement</span> <span class="o">=</span> <span class="n">displacement_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacement_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+            <span class="c1"># Compute the displacement value SE * normalized_displacement = E * vector(C, O_inf)</span>
+            <span class="c1">##magnitudes of se_lab along axis 2</span>
+            <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">se_lab</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">se_magnitude_reshaped</span> <span class="o">=</span> <span class="n">se_magnitude</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_displacement</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_magnitude_reshaped</span><span class="p">)</span>
+            <span class="n">displaced_mask</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">mask</span>
+            <span class="c1">#Ensure non-divergence from convergence  point</span>
+            <span class="c1">##Compute the distance map of the displaced mask&#39;s pixels to O_inf</span>
+            <span class="c1">##in the dist map put NaNs in the positions where nan_mask is false</span>
+            <span class="n">min_dist_idx</span> <span class="o">=</span> <span class="n">cra_sup</span><span class="p">(</span><span class="n">displaced_mask</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">nan_mask</span><span class="p">)</span>
+            <span class="c1"># Update the anti-dilated image with the chosen pixel value</span>
+            <span class="n">anti_dilated</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">displaced_mask</span><span class="p">[</span><span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_dist_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">anti_dilated</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="opening"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.opening">[docs]</a><span class="k">def</span> <span class="nf">opening</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Performs morphological opening on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">   Opening is a morphological operation that first erodes the input image using the specified structuring element,</span>
+<span class="sd">   followed by a dilation operation. It helps to remove small bright spots while preserving the larger structures.</span>
+
+<span class="sd">   Parameters:</span>
+<span class="sd">       value (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">       SE_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">       O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">       O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">   Returns:</span>
+<span class="sd">       numpy.ndarray: The result of the opening operation in LAB space.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+    <span class="n">opened_value</span> <span class="o">=</span> <span class="n">cra_erosion_rgb</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#SE_lab = reflectivity(SE_lab)</span>
+    <span class="n">opened_opened_value</span> <span class="o">=</span> <span class="n">cra_dilation_rgb</span><span class="p">(</span><span class="n">opened_value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">opened_opened_value</span></div>
+
+<div class="viewcode-block" id="closing"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.closing">[docs]</a><span class="k">def</span> <span class="nf">closing</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Performs closing on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">   Closing is a morphological operation that first dilates the input image using the specified structuring element,</span>
+<span class="sd">   followed by an erosion operation. It helps to close small dark gaps while preserving the larger structures.</span>
+
+<span class="sd">   Parameters:</span>
+<span class="sd">       value (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">       SE_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">       O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">       O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">   Returns:</span>
+<span class="sd">       numpy.ndarray: The result of the closing operation in LAB space.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+    <span class="n">closed_value</span> <span class="o">=</span> <span class="n">cra_dilation_rgb</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#SE_lab = reflectivity(SE_lab)</span>
+    <span class="n">closed_closed_value</span> <span class="o">=</span> <span class="n">cra_erosion_rgb</span><span class="p">(</span><span class="n">closed_value</span><span class="p">,</span> <span class="n">SE_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">closed_closed_value</span></div>
+
+<div class="viewcode-block" id="csomp"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.csomp">[docs]</a><span class="k">def</span> <span class="nf">csomp</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the Color Space Opening by Morphological Processing (CSOMP) on an RGB image using a structuring element (SE).</span>
+
+<span class="sd">    CSOMP is a morphological operation that computes the difference between an anti-dilated image and an eroded image</span>
+<span class="sd">    using the specified structuring element. It is useful for detecting and enhancing fine structures in color images.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_lab (numpy.ndarray): The structuring element (SE) in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]: A tuple containing the CSOMP result, the anti-dilated image,</span>
+<span class="sd">        and the eroded image in LAB space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">pretreatment</span> <span class="kn">import</span> <span class="n">reflectivity</span>
+    <span class="c1">#Eroded image with se structuring element</span>
+    <span class="n">eroded</span> <span class="o">=</span> <span class="n">cra_erosion_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#Anti-dilate with Refelectivity of se</span>
+    <span class="c1">#se = reflectivity(se_lab)</span>
+    <span class="n">anti_dilated</span> <span class="o">=</span> <span class="n">cra_anti_dilation_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#CSOMP=Anti_dilation - Erosion</span>
+    <span class="n">CSOMP</span> <span class="o">=</span> <span class="n">compute_distance_lab_img</span><span class="p">(</span><span class="n">anti_dilated</span><span class="p">,</span><span class="n">eroded</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CSOMP</span><span class="p">,</span> <span class="n">anti_dilated</span><span class="p">,</span><span class="n">eroded</span></div>
+
+<div class="viewcode-block" id="cmomp"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.cmomp">[docs]</a><span class="k">def</span> <span class="nf">cmomp</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_inf_lab</span><span class="p">,</span> <span class="n">su_sup_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs the Color Space Morphological Opening and Morphological Processing (CMOMP) on an RGB image</span>
+<span class="sd">    using structuring elements (SEs).</span>
+
+<span class="sd">    CMOMP is a morphological operation that computes the difference between an anti-dilated image and an eroded image</span>
+<span class="sd">    using two different structuring elements. It is useful for detecting and enhancing fine structures in color images.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img_lab (numpy.ndarray): The input image in LAB space.</span>
+<span class="sd">        se_inf_lab (numpy.ndarray): The structuring element for erosion in LAB space.</span>
+<span class="sd">        su_sup_lab (numpy.ndarray): The structuring element for anti-dilation in LAB space.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the color convergence point O-.</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the color convergence point O+.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]: A tuple containing the CMOMP result, the anti-dilated image,</span>
+<span class="sd">        and the eroded image in LAB space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="kn">from</span> <span class="nn">pretreatment</span> <span class="kn">import</span> <span class="n">reflectivity</span>
+    <span class="c1">#Eroded image with se structuring element</span>
+    <span class="n">eroded</span> <span class="o">=</span> <span class="n">CRA_erosion_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">se_inf_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#Anti-dilate with Refelectivity of se</span>
+    <span class="c1">#se = reflectivity(se_lab)</span>
+    <span class="n">su_sup_lab</span> <span class="o">=</span> <span class="n">su_sup_lab</span><span class="p">[:,::</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span>
+    <span class="n">anti_dilated</span> <span class="o">=</span> <span class="n">CRA_anti_dilation_rgb</span><span class="p">(</span><span class="n">img_lab</span><span class="p">,</span> <span class="n">su_sup_lab</span><span class="p">,</span>  <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="c1">#CSOMP=Anti_dilation - Erosion</span>
+    <span class="n">CMOMP</span> <span class="o">=</span> <span class="n">compute_distance_lab_img</span><span class="p">(</span><span class="n">anti_dilated</span><span class="p">,</span><span class="n">eroded</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CMOMP</span><span class="p">,</span> <span class="n">anti_dilated</span><span class="p">,</span><span class="n">eroded</span></div>
+<span class="c1">###########################################################################################</span>
+<div class="viewcode-block" id="construct_square_se_flat"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.construct_square_se_flat">[docs]</a><span class="k">def</span> <span class="nf">construct_square_se_flat</span><span class="p">(</span><span class="n">Value</span><span class="p">,</span><span class="n">size_of_SE</span><span class="p">,</span><span class="n">shape_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a flat structuring element (SE) as an array of size size_of_SE * size_of_SE.</span>
+<span class="sd">    The SE is a square with pixel values equal to Value in LAB space, and pixels not part of the square are assigned as NaN.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Value (numpy.ndarray): CIE LAB coordinates as a numpy array (e.g., np.array([L, a, b])).</span>
+<span class="sd">        size_of_SE (int): Size of the square SE.</span>
+<span class="sd">        shape_size (int): Size of the square within the SE.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Flat SE with specified size and shape in LAB space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if size_of_SE is odd</span>
+    <span class="k">if</span> <span class="n">size_of_SE</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">size_of_SE</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># Create an array of NaN values</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">size_of_SE</span><span class="p">,</span> <span class="n">size_of_SE</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the starting and ending indices for the square</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">size_of_SE</span> <span class="o">-</span> <span class="n">shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">end_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">shape_size</span>
+    <span class="c1"># Fill the square region with the specified Value</span>
+    <span class="n">SE</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">,</span> <span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">Value</span>
+    <span class="k">return</span> <span class="n">SE</span></div>
+
+<div class="viewcode-block" id="construct_round_se_flat"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.construct_round_se_flat">[docs]</a><span class="k">def</span> <span class="nf">construct_round_se_flat</span><span class="p">(</span><span class="n">Value</span><span class="p">,</span> <span class="n">size_of_SE</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Creates a flat linear structuring element (SE) as an array of size (3, 3, 3).</span>
+<span class="sd">   The SE represents a simple horizontal line with pixel values equal to Value in LAB space.</span>
+
+<span class="sd">   Parameters:</span>
+<span class="sd">       Value (numpy.ndarray): CIE LAB coordinates as a numpy array (e.g., np.array([L, a, b])).</span>
+<span class="sd">       shape_size (int): Size of the linear SE (should be odd).</span>
+
+<span class="sd">   Returns:</span>
+<span class="sd">       numpy.ndarray: Flat linear SE of specified shape in LAB space.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+    <span class="c1"># Check if size_of_SE is odd</span>
+    <span class="k">if</span> <span class="n">size_of_SE</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">size_of_SE</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1"># Create an array of NaN values</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">size_of_SE</span><span class="p">,</span> <span class="n">size_of_SE</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Compute the center of the circle</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">size_of_SE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="c1"># Compute the radius of the circle</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="c1"># Compute the squared radius for efficient calculation</span>
+    <span class="n">squared_radius</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="c1"># Iterate over each pixel in the SE and check if it is inside the circle</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size_of_SE</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size_of_SE</span><span class="p">):</span>
+            <span class="c1"># Compute the squared distance from the center</span>
+            <span class="n">squared_distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="c1"># Check if the pixel is inside the circle</span>
+            <span class="k">if</span> <span class="n">squared_distance</span> <span class="o">&lt;=</span> <span class="n">squared_radius</span><span class="p">:</span>
+                <span class="c1"># Assign the value to the pixel</span>
+                <span class="n">SE</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Value</span>
+    <span class="k">return</span> <span class="n">SE</span></div>
+
+<div class="viewcode-block" id="construct_linear_se_flat"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.construct_linear_se_flat">[docs]</a><span class="k">def</span> <span class="nf">construct_linear_se_flat</span><span class="p">(</span><span class="n">Value</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an array of size (3, 3, 3).</span>
+<span class="sd">    Represents a simple horizontal line with the specified Value.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Value : numpy.ndarray</span>
+<span class="sd">        CIE lab coordinates as a numpy array (e.g., np.array([L, a, b]))</span>
+<span class="sd">    shape_size : int</span>
+<span class="sd">        Size of the linear SE (should be odd).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SE : numpy.ndarray</span>
+<span class="sd">        Flat linear SE of shape (3, 3, 3).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if shape_size is odd</span>
+    <span class="k">if</span> <span class="n">shape_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">shape_size</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Create an array of NaN values</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">shape_size</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the starting and ending indices for the line</span>
+    <span class="n">start_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape_size</span> <span class="o">-</span> <span class="n">shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">end_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">shape_size</span>
+
+    <span class="c1"># Fill the line region with the specified Value</span>
+    <span class="n">SE</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">shape_size</span><span class="o">//</span><span class="mi">2</span><span class="p">),</span> <span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">Value</span>
+
+    <span class="k">return</span> <span class="n">SE</span></div>
+
+<div class="viewcode-block" id="extract_se_from_img"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.extract_se_from_img">[docs]</a><span class="k">def</span> <span class="nf">extract_se_from_img</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">posx</span><span class="p">,</span> <span class="n">posy</span><span class="p">,</span><span class="n">size_se</span><span class="p">,</span><span class="n">background_value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a rectangular structuring element (SE) from an LAB image located at position (posx, posy).</span>
+<span class="sd">    The SE is a rectangle with the specified size, and pixels outside the rectangle are assigned the background_value.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img (numpy.ndarray): LAB image from which to extract the SE.</span>
+<span class="sd">        posx (int): X-coordinate of the SE&#39;s center.</span>
+<span class="sd">        posy (int): Y-coordinate of the SE&#39;s center.</span>
+<span class="sd">        size_se (int): Size of the rectangular SE.</span>
+<span class="sd">        background_value (numpy.ndarray): CIE LAB coordinates for pixels outside the SE.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Extracted SE in LAB space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">size_se</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">size_se</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">posy</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">size_se</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="p">:</span><span class="n">posy</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">size_se</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">posx</span><span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">size_se</span><span class="o">//</span><span class="mi">2</span><span class="p">):</span> <span class="n">posx</span> <span class="o">+</span>  <span class="nb">int</span><span class="p">(</span><span class="n">size_se</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1">#put nan where SE array has (0,0,0) values</span>
+    <span class="c1">#SE[np.all(SE == [0, 0, 0], axis=-1)] = np.nan</span>
+    <span class="c1">#32.29567432   79.18557525 -107.85729885 / [1.00000000e+02, -2.44379044e-03,  4.66108322e-03]</span>
+    <span class="n">SE</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">SE</span><span class="p">)</span> <span class="o">!=</span> <span class="p">[</span><span class="mf">32.</span><span class="p">,</span><span class="mf">79.</span><span class="p">,</span> <span class="o">-</span><span class="mf">107.</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">background_value</span>
+    <span class="k">return</span> <span class="n">SE</span></div>
+<span class="c1">###############################################################################</span>
+<div class="viewcode-block" id="extend_convergence_pts"><a class="viewcode-back" href="../rgb_math_morphology_tools.html#rgb_math_morphology_tools.extend_convergence_pts">[docs]</a><span class="k">def</span> <span class="nf">extend_convergence_pts</span><span class="p">(</span><span class="n">O_sup_lab</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">,</span><span class="n">SE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extends the convergence points O_sup_lab and O_inf_lab based on a structuring element (SE).</span>
+<span class="sd">    The extension is performed to prevent saturation, and the new points are calculated along the direction</span>
+<span class="sd">    of the translation indicated by the SE.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        O_sup_lab (numpy.ndarray): LAB coordinates of the upper convergence point.</span>
+<span class="sd">        O_inf_lab (numpy.ndarray): LAB coordinates of the lower convergence point.</span>
+<span class="sd">        SE (numpy.ndarray): Structuring element used to determine the extension direction.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[numpy.ndarray, numpy.ndarray, float]: A tuple containing the new upper convergence point,</span>
+<span class="sd">        the new lower convergence point, and the distance between them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Direction vector of translation of O_sup</span>
+    <span class="n">direction_O_sup_translation</span> <span class="o">=</span> <span class="n">O_sup_lab</span> <span class="o">-</span> <span class="n">O_inf_lab</span>
+    <span class="c1">#diveide direction vector with its norm</span>
+    <span class="n">normalized_direction_O_sup</span> <span class="o">=</span> <span class="n">direction_O_sup_translation</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direction_O_sup_translation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#Direction vector of translation of O_inf_lab</span>
+    <span class="n">direction_O_inf_translation</span> <span class="o">=</span> <span class="n">O_inf_lab</span> <span class="o">-</span> <span class="n">O_sup_lab</span> 
+    <span class="c1">#diveide direction vector with its norm</span>
+    <span class="n">normalized_direction_O_inf</span> <span class="o">=</span> <span class="n">direction_O_inf_translation</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">direction_O_inf_translation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#norm of displacement = max_norm(SE)*3</span>
+    <span class="c1">#compute norme of each se vector &amp; get the max </span>
+    <span class="n">se_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">SE</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">se_max</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">se_magnitude</span><span class="p">)</span>
+    <span class="c1">#new_O_sup = O_sup_lab + np.multiply(direction_O_sup_translation,norm_of_displacement)</span>
+    <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_direction_O_sup</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_max</span><span class="p">)</span>
+    <span class="n">new_O_sup</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">O_sup_lab</span>
+    <span class="c1">#new_O_inf = O_inf_lab + np.multiply(direction_O_sup_translation,norm_of_displacement)</span>
+    <span class="n">displacement_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">normalized_direction_O_inf</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">se_max</span><span class="p">)</span>
+    <span class="n">new_O_inf</span> <span class="o">=</span> <span class="n">displacement_vector</span> <span class="o">+</span> <span class="n">O_inf_lab</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|se| max&quot;</span><span class="p">,</span><span class="n">se_max</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;O_sup lab&quot;</span><span class="p">,</span> <span class="n">O_sup_lab</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new_O_sup&quot;</span><span class="p">,</span><span class="n">new_O_sup</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;O_inf lab&quot;</span><span class="p">,</span> <span class="n">O_inf_lab</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;new_O_inf&quot;</span><span class="p">,</span><span class="n">new_O_inf</span><span class="p">)</span>
+    <span class="n">d_conv_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">new_O_sup</span><span class="o">-</span><span class="n">new_O_inf</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;convergence points distance&quot;</span><span class="p">,</span><span class="n">d_conv_pts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_O_sup</span><span class="p">,</span> <span class="n">new_O_inf</span><span class="p">,</span><span class="n">d_conv_pts</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

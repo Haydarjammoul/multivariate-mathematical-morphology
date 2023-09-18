@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>order module &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pretreatment module" href="pretreatment.html" />
+    <link rel="prev" title="lib" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">lib</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">order module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pretreatment.html">pretreatment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rgb_math_morphology_tools.html">rgb_math_morphology_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthesize.html">synthesize module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">lib</a></li>
+      <li class="breadcrumb-item active">order module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/order.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-order">
+<span id="order-module"></span><h1>order module<a class="headerlink" href="#module-order" title="Permalink to this heading"></a></h1>
+<p>Created on Mon Jun 19 18:16:26 2023</p>
+<p>&#64;author: hjammoul
+Ordering &amp; distance computation is here</p>
+<p>Ordering_fct_inf &amp; Ordering_fct_sup have the same implementation but different philosophies (WaW)</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="order.compute_distance_lab_img">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">compute_distance_lab_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#compute_distance_lab_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.compute_distance_lab_img" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the Euclidean distance map between pixels of two images in CIELAB color space.
+:param image1: The first image.
+:type image1: ndarray
+:param image2: The second image.
+:type image2: ndarray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The distance map, representing the Euclidean distances between the pixels of the two images.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.compute_distance_map">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">compute_distance_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">displaced_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_A</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#compute_distance_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.compute_distance_map" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the distance map between the pixels of a displaced mask and a reference point in CIELAB color space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>displaced_mask</strong> (<em>ndarray</em>) – The mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</p></li>
+<li><p><strong>ref_A</strong> (<em>ndarray</em>) – The LAB coordinates of the reference point O+ or O- (shape: (3,)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The distance map, representing the Euclidean distances between each pixel and the reference point.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.cra_inf">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">cra_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">displaced_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#cra_inf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.cra_inf" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the pixel index with the minimum g(Ci) value based on CRA ordering for inferior pixels.</p>
+<dl class="simple">
+<dt>Rational:</dt><dd><p>Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps
+use them to compute g(Ci) array
+g(Ci) = d(O-,Ci)/d(O+,Ci)
+g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH
+g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH
+particular cases:
+Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+
+Minimum: g(Ci)=0 =&gt; Ci is equal to O-
+Find maximum:
+In g(Ci) array, if at a certain position there is inf/nan, return its indices.
+Otherwise, return the position of the minimum g value.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>displaced_mask</strong> (<em>ndarray</em>) – Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>ndarray</em>) – LAB coordinates of the upper convergence point (O+) (shape: (3,)).</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>ndarray</em>) – LAB coordinates of the lower convergence point (O-) (shape: (3,)).</p></li>
+<li><p><strong>nan_mask</strong> (<em>ndarray</em>) – Mask indicating NaN values (shape: (se_size, se_size, 1)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (row, column) of the chosen pixel for inferior convergence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.cra_median">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">cra_median</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">displaced_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#cra_median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.cra_median" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the pixel index with the median g(Ci) value based on CRA ordering.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Rational:</dt><dd><p>Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps
+use them to compute g(Ci) array
+g(Ci) = d(O-,Ci)/d(O+,Ci)
+g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH
+g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH
+particular cases:
+Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+
+Minimum: g(Ci)=0 =&gt; Ci is equal to O-
+Find median:
+In g(Ci) array, calculate the median value and find the index of the pixel with the closest g value to the median.
+Return the index of the pixel with the closest g value to the median.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>displaced_mask</strong> (<em>ndarray</em>) – Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>ndarray</em>) – LAB coordinates of the upper convergence point (O+) (shape: (3,)).</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>ndarray</em>) – LAB coordinates of the lower convergence point (O-) (shape: (3,)).</p></li>
+<li><p><strong>nan_mask</strong> (<em>ndarray</em>) – Mask indicating NaN values (shape: (se_size, se_size, 1)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (row, column) of the chosen pixel for median convergence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.cra_sup">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">cra_sup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">displaced_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#cra_sup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.cra_sup" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the pixel index with the maximum g(Ci) value based on CRA ordering for superior pixels.</p>
+<dl class="simple">
+<dt>Rational:</dt><dd><p>Compute distance of each pixel to both O_sup and O_inf =&gt; 2 distance maps
+use them to compute g(Ci) array
+g(Ci) = d(O-,Ci)/d(O+,Ci)
+g value higher =&gt; Ci is HIGHER +&gt; USED FOR SUP SEARCH
+g value lower =&gt; Ci is lOWER +&gt; USED FOR INF SEARCH
+particular cases:
+Maximum: inf/nan g(Ci) =&gt; Ci is equal to O+
+Minimum: g(Ci)=0 =&gt; Ci is equal to O-
+Find maximum:
+In g(Ci) array, if at a certain position there is inf/nan, return its indices.
+Otherwise, return the position of the minimum g value.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>displaced_mask</strong> (<em>ndarray</em>) – Mask after displacement by a structuring element (shape: (se_size, se_size, 3)).</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>ndarray</em>) – LAB coordinates of the upper convergence point (O+) (shape: (3,)).</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>ndarray</em>) – LAB coordinates of the lower convergence point (O-) (shape: (3,)).</p></li>
+<li><p><strong>nan_mask</strong> (<em>ndarray</em>) – Mask indicating NaN values (shape: (se_size, se_size, 1)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (row, column) of the chosen pixel for superior convergence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.ordering_fct_inf">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">ordering_fct_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distamp_inf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#ordering_fct_inf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.ordering_fct_inf" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the pixel index having the closest point O- based on a given distance map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distamp_inf</strong> (<em>numpy.ndarray</em>) – Distance map of the displaced mask’s inferior pixels to the reference point.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (row, column) of the chosen pixel in the <cite>g_inf</cite> array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="order.ordering_fct_sup">
+<span class="sig-prename descclassname"><span class="pre">order.</span></span><span class="sig-name descname"><span class="pre">ordering_fct_sup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distamp_sup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/order.html#ordering_fct_sup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#order.ordering_fct_sup" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the pixel index having the closest point O+ based on a given distance map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distamp_sup</strong> (<em>numpy.ndarray</em>) – Distance map of the displaced mask’s superior pixels to the reference point.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index (row, column) of the chosen pixel in the <cite>g_sup</cite> array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="lib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pretreatment.html" class="btn btn-neutral float-right" title="pretreatment module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

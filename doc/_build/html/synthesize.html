@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>synthesize module &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="rgb_math_morphology_tools module" href="rgb_math_morphology_tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">lib</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="order.html">order module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pretreatment.html">pretreatment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rgb_math_morphology_tools.html">rgb_math_morphology_tools module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">synthesize module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">lib</a></li>
+      <li class="breadcrumb-item active">synthesize module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/synthesize.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-synthesize">
+<span id="synthesize-module"></span><h1>synthesize module<a class="headerlink" href="#module-synthesize" title="Permalink to this heading"></a></h1>
+<p>Created on Fri Jul 14 13:46:08 2023</p>
+<p>&#64;author: hjammoul
+The aim of this file is to Synthesize images for testing.
+functions are:</p>
+<blockquote>
+<div><p>draw_shape
+generate_color_img
+generate_img_contrast_difference_effect
+generate_img_shape_size_difference_effect
+get_slice
+Construct_disk_SE</p>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.construct_disk_SE">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">construct_disk_SE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_of_SE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#construct_disk_SE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.construct_disk_SE" title="Permalink to this definition"></a></dt>
+<dd><p>Create a flat structuring element (SE) in the shape of a disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Value</strong> (<em>tuple</em>) – CIE Lab coordinates for the disk color.</p></li>
+<li><p><strong>size_of_SE</strong> (<em>int</em>) – Size of the square SE (odd value).</p></li>
+<li><p><strong>shape_size</strong> (<em>int</em>) – Size of the disk.</p></li>
+<li><p><strong>background</strong> (<em>tuple</em><em>, </em><em>optional</em>) – RGB color for the background, by default (0, 0, 0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated flat SE.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SE (numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>SE = Construct_disk_SE((L, a, b), 9, 9, (255, 255, 255))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.draw_shape">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">draw_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_color</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#draw_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.draw_shape" title="Permalink to this definition"></a></dt>
+<dd><p>Draw a shape on an image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>numpy.ndarray</em>) – The image on which the shape will be drawn.</p></li>
+<li><p><strong>x</strong> (<em>int</em>) – The x-coordinate of the shape’s position.</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – The y-coordinate of the shape’s position.</p></li>
+<li><p><strong>shape_size</strong> (<em>int</em>) – The size of the shape.</p></li>
+<li><p><strong>shape_type</strong> (<em>str</em>) – The type of shape (‘triangle’, ‘square’, or ‘circle’).</p></li>
+<li><p><strong>shape_color</strong> (<em>tuple</em>) – The RGB color of the shape.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>img (numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p># Draw a blue square at position (50, 50) with a size of 30 pixels.
+draw_shape(img, 50, 50, 30, ‘square’, (0, 0, 255))</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.generate_color_img">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">generate_color_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shapes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_min_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CSOMP'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_background_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#generate_color_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.generate_color_img" title="Permalink to this definition"></a></dt>
+<dd><p>Generate an RGB image with different shapes (triangles, crosses, circles) of different colors.
+The image is used for testing CMOMP and CSOMP.
+The SEs will be drawn in the image.
+:param height_img: Height and width of the image.
+:type height_img: int
+:param num_shapes: Number of shapes to generate.
+:type num_shapes: int
+:param shape_min_size: Minimum size of shapes in pixels.
+:type shape_min_size: int
+:param shape_max_size: Maximum size of shapes in pixels.
+:type shape_max_size: int
+:param mode: ‘CSOMP’ or ‘CMOMP’ to generate one or two SEs.
+:type mode: str
+:param img_background_color: RGB color for the background.
+:type img_background_color: tuple
+:param target_color: RGB color for the target shape in CSOMP mode.
+:type target_color: tuple</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The generated RGB image.
+se_img (numpy.ndarray) in RGB: The structuring element (SE) image in CSOMP mode.
+se_inf_img (numpy.ndarray) in RGB: The inferior structuring element (SE) image in CMOMP mode.
+se_sup_img (numpy.ndarray) in RGB : The superior structuring element (SE) image in CMOMP mode.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>img (numpy.ndarray) in RGB</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<dl class="simple">
+<dt>img, se_inf_img, se_sup_img = generate_color_img(height_img=200, num_shapes=10, shape_min_size=40, shape_max_size=40, mode=’CSOMP’,</dt><dd><p>img_background_color=(0, 0, 0),target_color = (255,255,255))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.generate_img_contrast_difference_effect">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">generate_img_contrast_difference_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_background_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">230)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_circles_per_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">circle_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#generate_img_contrast_difference_effect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.generate_img_contrast_difference_effect" title="Permalink to this definition"></a></dt>
+<dd><p>Generate an image with circles of varying colors and contrast differences.
+The variationss are manually set inside the definiton in case u might need to change them.(arrays: blue variations, red variations…)
+They’re variations for each RGB channel.
+:param height_img: Height of the generated image, by default 50.
+:type height_img: int, optional
+:param img_background_color: RGB tuple representing the background color of the image, by default (0, 0, 0).
+:type img_background_color: tuple, optional
+:param target_color: RGB tuple representing the color of the first circle, by default (0, 0, 230).
+:type target_color: tuple, optional
+:param num_circles_per_line: Number of circles per line, by default 5.
+:type num_circles_per_line: int, optional
+:param circle_radius: Radius of the circles, by default 8.
+:type circle_radius: int, optional
+:param noise_std: Standard deviation of noise to add to the image, by default 0.
+:type noise_std: int, optional</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The generated RGB image with circles of different colors.
+se_inf_img (numpy.ndarray): The generated RGB image of the SE_inf circle with color variations.
+se_sup_img (numpy.ndarray): The generated RGB image of the SE_sup circle with color variations.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>rgb_img (numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<dl class="simple">
+<dt>img_rgb, se_inf_rgb, se_sup_rgb = generate_img_contrast_difference_effect(height_img=150, img_background_color=(0, 0, 0),</dt><dd><p>target_color=(0, 0, 230), num_circles_per_line=5,
+circle_radius=8, noise_std=0)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.generate_img_shape_size_difference_effect">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">generate_img_shape_size_difference_effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_background_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">230)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shapes_per_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_shape_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#generate_img_shape_size_difference_effect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.generate_img_shape_size_difference_effect" title="Permalink to this definition"></a></dt>
+<dd><p>Generate an image with different shapes and their size variations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>height_img</strong> (<em>int</em><em>, </em><em>optional</em>) – Height of the generated image, by default 50.</p></li>
+<li><p><strong>img_background_color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – RGB tuple representing the background color of the image, by default (0, 0, 0).</p></li>
+<li><p><strong>target_color</strong> (<em>tuple</em><em>, </em><em>optional</em>) – RGB tuple representing the color of the shapes, by default (0, 0, 230).</p></li>
+<li><p><strong>num_shapes_per_line</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of shapes per line, by default 5.</p></li>
+<li><p><strong>initial_shape_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Initial size of the shapes, by default 6.</p></li>
+<li><p><strong>target_radius</strong> (<em>int</em><em>, </em><em>optional</em>) – Radius of the target shape, by default 12.</p></li>
+<li><p><strong>noise_std</strong> (<em>int</em><em>, </em><em>optional</em>) – Standard deviation of noise to add to the image, by default 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated RGB image with different shapes and their size variations.
+se_inf_img (numpy.ndarray): The generated RGB image of the SE_inf shape with size variations.
+se_sup_img (numpy.ndarray): The generated RGB image of the SE_sup shape with size variations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rgb_img (numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<dl class="simple">
+<dt>img_rgb, se_inf_rgb, se_sup_rgb = generate_img_shape_size_difference_effect(height_img=50, img_background_color=(0, 0, 0),</dt><dd><p>target_color=(0, 0, 230), num_shapes_per_line=5,
+initial_shape_size=6, target_radius=12, noise_std=0)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="synthesize.get_slice">
+<span class="sig-prename descclassname"><span class="pre">synthesize.</span></span><span class="sig-name descname"><span class="pre">get_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/synthesize.html#get_slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#synthesize.get_slice" title="Permalink to this definition"></a></dt>
+<dd><p>Get a slice from a Mice heart image in TIFF format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_file</strong> (<em>str</em>) – Path to the TIFF image file.</p></li>
+<li><p><strong>z</strong> (<em>int</em>) – Slice number to retrieve.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The specified image slice as a 2D numpy array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>slice (numpy.ndarray)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>slice = get_slice(path_to_img , 150)</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rgb_math_morphology_tools.html" class="btn btn-neutral float-left" title="rgb_math_morphology_tools module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>synthesize &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">lib</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">synthesize</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for synthesize</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Fri Jul 14 13:46:08 2023</span>
+
+<span class="sd">@author: hjammoul</span>
+<span class="sd">The aim of this file is to Synthesize images for testing.</span>
+<span class="sd">functions are: </span>
+<span class="sd">    draw_shape</span>
+<span class="sd">    generate_color_img</span>
+<span class="sd">    generate_img_contrast_difference_effect</span>
+<span class="sd">    generate_img_shape_size_difference_effect</span>
+<span class="sd">    get_slice</span>
+<span class="sd">    Construct_disk_SE</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">tifffile</span>
+<span class="c1">#######################################################</span>
+
+<div class="viewcode-block" id="draw_shape"><a class="viewcode-back" href="../synthesize.html#synthesize.draw_shape">[docs]</a><span class="k">def</span> <span class="nf">draw_shape</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">shape_type</span><span class="p">,</span> <span class="n">shape_color</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Draw a shape on an image.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        img (numpy.ndarray): The image on which the shape will be drawn.</span>
+<span class="sd">        x (int): The x-coordinate of the shape&#39;s position.</span>
+<span class="sd">        y (int): The y-coordinate of the shape&#39;s position.</span>
+<span class="sd">        shape_size (int): The size of the shape.</span>
+<span class="sd">        shape_type (str): The type of shape (&#39;triangle&#39;, &#39;square&#39;, or &#39;circle&#39;).</span>
+<span class="sd">        shape_color (tuple): The RGB color of the shape.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        img (numpy.ndarray) </span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        # Draw a blue square at position (50, 50) with a size of 30 pixels.</span>
+<span class="sd">        draw_shape(img, 50, 50, 30, &#39;square&#39;, (0, 0, 255))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">shape_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">shape_size</span> <span class="o">=</span> <span class="n">shape_size</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;triangle&#39;</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">)])</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">points</span><span class="p">],</span> <span class="n">shape_color</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;square&#39;</span><span class="p">:</span>
+        <span class="n">tpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">tpoints</span><span class="p">],</span> <span class="n">shape_color</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">shape_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img</span></div>
+
+<div class="viewcode-block" id="generate_color_img"><a class="viewcode-back" href="../synthesize.html#synthesize.generate_color_img">[docs]</a><span class="k">def</span> <span class="nf">generate_color_img</span><span class="p">(</span><span class="n">height_img</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">num_shapes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape_min_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">shape_max_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;CSOMP&#39;</span><span class="p">,</span>
+                       <span class="n">img_background_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span><span class="n">target_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an RGB image with different shapes (triangles, crosses, circles) of different colors.</span>
+<span class="sd">    The image is used for testing CMOMP and CSOMP.</span>
+<span class="sd">    The SEs will be drawn in the image.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        height_img (int): Height and width of the image.</span>
+<span class="sd">        num_shapes (int): Number of shapes to generate.</span>
+<span class="sd">        shape_min_size (int): Minimum size of shapes in pixels.</span>
+<span class="sd">        shape_max_size (int): Maximum size of shapes in pixels.</span>
+<span class="sd">        mode (str): &#39;CSOMP&#39; or &#39;CMOMP&#39; to generate one or two SEs.</span>
+<span class="sd">        img_background_color (tuple): RGB color for the background.</span>
+<span class="sd">        target_color (tuple): RGB color for the target shape in CSOMP mode.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        img (numpy.ndarray) in RGB: The generated RGB image.</span>
+<span class="sd">        se_img (numpy.ndarray) in RGB: The structuring element (SE) image in CSOMP mode.</span>
+<span class="sd">        se_inf_img (numpy.ndarray) in RGB: The inferior structuring element (SE) image in CMOMP mode.</span>
+<span class="sd">        se_sup_img (numpy.ndarray) in RGB : The superior structuring element (SE) image in CMOMP mode.</span>
+<span class="sd">    Example:</span>
+<span class="sd">        img, se_inf_img, se_sup_img = generate_color_img(height_img=200, num_shapes=10, shape_min_size=40, shape_max_size=40, mode=&#39;CSOMP&#39;,</span>
+<span class="sd">                               img_background_color=(0, 0, 0),target_color = (255,255,255))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a blank RGB image</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">height_img</span><span class="p">,</span> <span class="n">height_img</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="c1"># Generate the shapes</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_shapes</span><span class="p">):</span>
+        <span class="c1"># Generate a random shape position and size</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height_img</span> <span class="o">-</span> <span class="n">shape_max_size</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">height_img</span> <span class="o">-</span> <span class="n">shape_max_size</span><span class="p">)</span>
+        <span class="n">shape_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">shape_min_size</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape_max_size</span><span class="p">)</span>
+        <span class="c1"># Generate a random shape type</span>
+        <span class="n">shape_type</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;triangle&#39;</span><span class="p">,</span> <span class="s1">&#39;cross&#39;</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">])</span>
+        <span class="c1"># Generate a random RGB color</span>
+        <span class="n">shape_color</span> <span class="o">=</span> <span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">shape_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+           <span class="n">shape_size</span> <span class="o">=</span> <span class="n">shape_size</span><span class="o">+</span><span class="mi">1</span>
+        <span class="c1"># Draw the shape on the image</span>
+        <span class="k">if</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;triangle&#39;</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">)])</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">points</span><span class="p">],</span> <span class="n">shape_color</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;cross&#39;</span><span class="p">:</span>
+            <span class="n">tpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="p">,</span> <span class="n">y</span><span class="o">+</span> <span class="n">shape_size</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span> <span class="n">shape_size</span> <span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)])</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">tpoints</span><span class="p">],</span> <span class="n">shape_color</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s1">&#39;circle&#39;</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">shape_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#Put SE target in image</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">150</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">150</span>
+    <span class="n">shape_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">shape_min_size</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape_max_size</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">shape_size</span><span class="p">)])</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">[</span><span class="n">points</span><span class="p">],</span> <span class="n">target_color</span><span class="p">)</span>
+    <span class="c1">#In the case of CSOMP SE is this triangle with black background;</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;CSOMP&#39;</span><span class="p">:</span>  <span class="c1"># Assuming SE is always a triangle</span>
+            <span class="c1"># Generate a black background for the SE</span>
+            <span class="n">se_background_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="c1">#se_background_color = tuple(c // 100 for c in target_color)</span>
+            <span class="n">se_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">shape_size</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">shape_size</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">se_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="c1">#se_img = np.full((shape_size+2, shape_size+2, 3), np.nan, dtype=np.float32)</span>
+            <span class="c1"># Draw the SE triangle on the black background</span>
+            <span class="n">se_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="p">)])</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">se_img</span><span class="p">,</span> <span class="p">[</span><span class="n">se_points</span><span class="p">],</span> <span class="n">target_color</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">se_img</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;CMOMP&#39;</span><span class="p">:</span>
+        <span class="c1"># Create two triangles, two SEs: se_inf and se_sup</span>
+        <span class="c1"># se_inf has color: target_color-5</span>
+        <span class="n">se_background_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">se_inf_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">-</span> <span class="mi">20</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">target_color</span><span class="p">)</span>
+        <span class="n">se_inf_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">se_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">se_inf_shape_size</span> <span class="o">=</span> <span class="n">shape_size</span><span class="o">//</span><span class="mi">2</span>
+        <span class="n">x_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">se_inf_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">se_inf_shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">y_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">se_inf_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">se_inf_shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">se_inf_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">),</span> <span class="p">(</span><span class="n">x_offset</span> <span class="o">+</span> <span class="n">se_inf_shape_size</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">),</span> <span class="p">(</span><span class="n">x_offset</span> <span class="o">+</span> <span class="n">se_inf_shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="n">se_inf_shape_size</span><span class="p">)])</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">se_inf_img</span><span class="p">,</span> <span class="p">[</span><span class="n">se_inf_points</span><span class="p">],</span> <span class="n">se_inf_color</span><span class="p">)</span>
+        <span class="c1"># se_sup has color: target_color+5</span>
+        <span class="n">se_sup_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">target_color</span><span class="p">)</span>
+        <span class="n">se_sup_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="n">shape_size</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">se_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">se_sup_shape_size</span> <span class="o">=</span> <span class="n">shape_size</span><span class="o">*</span><span class="mi">2</span>
+        <span class="n">x_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">se_sup_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">se_sup_shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">y_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">se_sup_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">se_sup_shape_size</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">se_sup_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x_offset</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">),</span> <span class="p">(</span><span class="n">x_offset</span> <span class="o">+</span> <span class="n">se_sup_shape_size</span><span class="p">,</span> <span class="n">y_offset</span><span class="p">),</span> <span class="p">(</span><span class="n">x_offset</span> <span class="o">+</span> <span class="n">se_sup_shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="n">se_sup_shape_size</span><span class="p">)])</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">fillPoly</span><span class="p">(</span><span class="n">se_sup_img</span><span class="p">,</span> <span class="p">[</span><span class="n">se_sup_points</span><span class="p">],</span> <span class="n">se_sup_color</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">img</span><span class="p">,</span> <span class="n">se_inf_img</span><span class="p">,</span> <span class="n">se_sup_img</span></div>
+
+
+<div class="viewcode-block" id="generate_img_contrast_difference_effect"><a class="viewcode-back" href="../synthesize.html#synthesize.generate_img_contrast_difference_effect">[docs]</a><span class="k">def</span> <span class="nf">generate_img_contrast_difference_effect</span><span class="p">(</span><span class="n">height_img</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">img_background_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">target_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">230</span><span class="p">),</span>  
+                                            <span class="n">num_circles_per_line</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">noise_std</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Generate an image with circles of varying colors and contrast differences.</span>
+<span class="sd">  The variationss are manually set inside the definiton in case u might need to change them.(arrays: blue variations, red variations...)</span>
+<span class="sd">  They&#39;re variations for each RGB channel.</span>
+<span class="sd">  Parameters:</span>
+<span class="sd">      height_img (int, optional): Height of the generated image, by default 50.</span>
+<span class="sd">      img_background_color (tuple, optional): RGB tuple representing the background color of the image, by default (0, 0, 0).</span>
+<span class="sd">      target_color (tuple, optional): RGB tuple representing the color of the first circle, by default (0, 0, 230).</span>
+<span class="sd">      num_circles_per_line (int, optional): Number of circles per line, by default 5.</span>
+<span class="sd">      circle_radius (int, optional): Radius of the circles, by default 8.</span>
+<span class="sd">      noise_std (int, optional): Standard deviation of noise to add to the image, by default 0.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">      rgb_img (numpy.ndarray): The generated RGB image with circles of different colors.</span>
+<span class="sd">      se_inf_img (numpy.ndarray): The generated RGB image of the SE_inf circle with color variations.</span>
+<span class="sd">      se_sup_img (numpy.ndarray): The generated RGB image of the SE_sup circle with color variations.</span>
+<span class="sd">  </span>
+<span class="sd">  Example:</span>
+<span class="sd">      img_rgb, se_inf_rgb, se_sup_rgb = generate_img_contrast_difference_effect(height_img=150, img_background_color=(0, 0, 0),</span>
+<span class="sd">                                                                                target_color=(0, 0, 230), num_circles_per_line=5,</span>
+<span class="sd">                                                                                circle_radius=8, noise_std=0)</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="c1"># Create a blank RGB image</span>
+    <span class="n">rgb_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">height_img</span><span class="p">,</span> <span class="n">height_img</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="c1"># Generate the circles</span>
+
+    <span class="c1"># Calculate the step size for placing circles uniformly on the same line</span>
+    <span class="n">step_x</span> <span class="o">=</span> <span class="n">height_img</span> <span class="o">//</span> <span class="p">(</span><span class="n">num_circles_per_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">step_y</span> <span class="o">=</span> <span class="n">height_img</span> <span class="o">//</span> <span class="mi">4</span>
+
+    <span class="c1"># Define fixed variations in color coordinates for each circle</span>
+    <span class="n">blue_variations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">40</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">80</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">red_variations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">green_variations</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Draw circles with changes in the blue coordinate (first line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_circles_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">step_y</span>
+        <span class="n">circle_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">blue_variations</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">target_color</span><span class="p">))</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">circle_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Draw circles with changes in the red coordinate (second line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_circles_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">step_y</span>
+        <span class="n">circle_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">red_variations</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">target_color</span><span class="p">))</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">circle_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Draw circles with changes in the green coordinate (third line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_circles_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">step_y</span>
+        <span class="n">circle_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">green_variations</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">target_color</span><span class="p">))</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">circle_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Add noise to the rgb_img</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">noise_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">rgb_img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">rgb_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rgb_img</span> <span class="o">+</span> <span class="n">noise</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+
+    <span class="c1"># Define SE_inf: circle with same shape and color target_color + inf_variations</span>
+    <span class="n">inf_variations</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">se_inf_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">inf_variations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">target_color</span><span class="p">))</span>
+    <span class="n">se_inf_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">circle_radius</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">circle_radius</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">se_inf_img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">se_inf_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Define SE_sup: circle with same shape and color target_color + sup_variations</span>
+    <span class="n">sup_variations</span> <span class="o">=</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">se_sup_color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">sup_variations</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">target_color</span><span class="p">))</span>
+    <span class="n">se_sup_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">circle_radius</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">circle_radius</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">se_sup_img</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">circle_radius</span><span class="p">,</span> <span class="n">se_sup_color</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rgb_img</span><span class="p">,</span> <span class="n">se_inf_img</span><span class="p">,</span> <span class="n">se_sup_img</span></div>
+
+<div class="viewcode-block" id="generate_img_shape_size_difference_effect"><a class="viewcode-back" href="../synthesize.html#synthesize.generate_img_shape_size_difference_effect">[docs]</a><span class="k">def</span> <span class="nf">generate_img_shape_size_difference_effect</span><span class="p">(</span><span class="n">height_img</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">img_background_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">target_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">230</span><span class="p">),</span>
+                                             <span class="n">num_shapes_per_line</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">initial_shape_size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span><span class="n">target_radius</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="n">noise_std</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate an image with different shapes and their size variations.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        height_img (int, optional): Height of the generated image, by default 50.</span>
+<span class="sd">        img_background_color (tuple, optional): RGB tuple representing the background color of the image, by default (0, 0, 0).</span>
+<span class="sd">        target_color (tuple, optional): RGB tuple representing the color of the shapes, by default (0, 0, 230).</span>
+<span class="sd">        num_shapes_per_line (int, optional): Number of shapes per line, by default 5.</span>
+<span class="sd">        initial_shape_size (int, optional): Initial size of the shapes, by default 6.</span>
+<span class="sd">        target_radius (int, optional): Radius of the target shape, by default 12.</span>
+<span class="sd">        noise_std (int, optional): Standard deviation of noise to add to the image, by default 0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        rgb_img (numpy.ndarray): The generated RGB image with different shapes and their size variations.</span>
+<span class="sd">        se_inf_img (numpy.ndarray): The generated RGB image of the SE_inf shape with size variations.</span>
+<span class="sd">        se_sup_img (numpy.ndarray): The generated RGB image of the SE_sup shape with size variations.</span>
+<span class="sd">    </span>
+<span class="sd">    Example:</span>
+<span class="sd">        img_rgb, se_inf_rgb, se_sup_rgb = generate_img_shape_size_difference_effect(height_img=50, img_background_color=(0, 0, 0),</span>
+<span class="sd">                                                                                    target_color=(0, 0, 230), num_shapes_per_line=5,</span>
+<span class="sd">                                                                                    initial_shape_size=6, target_radius=12, noise_std=0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a blank RGB image</span>
+    <span class="n">rgb_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">height_img</span><span class="p">,</span> <span class="n">height_img</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img_background_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate the step size for placing shapes uniformly on the same line</span>
+    <span class="n">step_x</span> <span class="o">=</span> <span class="n">height_img</span> <span class="o">//</span> <span class="p">(</span><span class="n">num_shapes_per_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">step_y</span> <span class="o">=</span> <span class="n">height_img</span> <span class="o">//</span> <span class="mi">4</span>
+    
+    <span class="c1"># Define fixed variations in shape size for each line</span>
+    <span class="n">triangle_size_variations</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    <span class="n">square_size_variations</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    <span class="n">circle_size_variations</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+    
+    <span class="c1"># Draw triangles with size variations (first line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_shapes_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">step_y</span>
+        <span class="n">shape_size</span> <span class="o">=</span> <span class="n">initial_shape_size</span> <span class="o">+</span> <span class="n">triangle_size_variations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">draw_shape</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="s1">&#39;triangle&#39;</span><span class="p">,</span> <span class="n">target_color</span><span class="p">)</span>
+    
+    <span class="c1"># Draw squares with size variations (second line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_shapes_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">step_y</span>
+        <span class="n">shape_size</span> <span class="o">=</span> <span class="n">initial_shape_size</span> <span class="o">+</span> <span class="n">square_size_variations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">draw_shape</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="s1">&#39;square&#39;</span><span class="p">,</span> <span class="n">target_color</span><span class="p">)</span>
+    
+    <span class="c1"># Draw circles with size variations (third line)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_shapes_per_line</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">step_y</span>
+        <span class="n">shape_size</span> <span class="o">=</span> <span class="n">initial_shape_size</span> <span class="o">+</span> <span class="n">circle_size_variations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">draw_shape</span><span class="p">(</span><span class="n">rgb_img</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="n">target_color</span><span class="p">)</span>
+    
+    <span class="c1"># Define SE_inf: shape with same color and size target_color + inf_variations</span>
+    <span class="n">inf_variations</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">se_inf_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">target_radius</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">draw_shape</span><span class="p">(</span><span class="n">se_inf_img</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="n">inf_variations</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="n">target_color</span><span class="p">)</span>
+    
+    <span class="c1"># Define SE_sup: shape with same color and size target_color + sup_variations</span>
+    <span class="n">sup_variations</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">se_sup_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">target_radius</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">draw_shape</span><span class="p">(</span><span class="n">se_sup_img</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">target_radius</span> <span class="o">+</span> <span class="n">sup_variations</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">,</span> <span class="n">target_color</span><span class="p">)</span>
+    
+    <span class="c1"># Add noise to the rgb_img</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">noise_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">rgb_img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">rgb_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rgb_img</span> <span class="o">+</span> <span class="n">noise</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Se sup radius, Se_inf radius:&quot;</span><span class="p">,</span><span class="n">target_radius</span> <span class="o">+</span> <span class="n">sup_variations</span><span class="p">,</span><span class="n">target_radius</span> <span class="o">+</span> <span class="n">inf_variations</span> <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;smallest radius&quot;</span><span class="p">,</span> <span class="n">initial_shape_size</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;biggest radius&quot;</span><span class="p">,</span> <span class="n">initial_shape_size</span><span class="o">+</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rgb_img</span><span class="p">,</span> <span class="n">se_inf_img</span><span class="p">,</span> <span class="n">se_sup_img</span></div>
+
+
+<div class="viewcode-block" id="get_slice"><a class="viewcode-back" href="../synthesize.html#synthesize.get_slice">[docs]</a><span class="k">def</span> <span class="nf">get_slice</span><span class="p">(</span><span class="n">image_file</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a slice from a Mice heart image in TIFF format.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        image_file (str): Path to the TIFF image file.</span>
+<span class="sd">        z (int): Slice number to retrieve.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        slice (numpy.ndarray): The specified image slice as a 2D numpy array.</span>
+<span class="sd">        </span>
+<span class="sd">    Example:</span>
+<span class="sd">        slice = get_slice(path_to_img , 150)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Read the TIFF image</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tifffile</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+    <span class="c1"># Get the dimensions of the image and the slice</span>
+    <span class="c1">##Z, ch, y,x</span>
+    <span class="c1">#image_height, _, _, _ = image.shape</span>
+    <span class="c1"># Take the required slice</span>
+    <span class="n">slice_image_rgb</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">z</span><span class="p">,:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="c1">###ype is unint16</span>
+    <span class="k">return</span> <span class="n">slice_image_rgb</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="construct_disk_SE"><a class="viewcode-back" href="../synthesize.html#synthesize.construct_disk_SE">[docs]</a><span class="k">def</span> <span class="nf">construct_disk_SE</span><span class="p">(</span><span class="n">Value</span><span class="p">,</span> <span class="n">size_of_SE</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a flat structuring element (SE) in the shape of a disk.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        Value (tuple): CIE Lab coordinates for the disk color.</span>
+<span class="sd">        size_of_SE (int): Size of the square SE (odd value).</span>
+<span class="sd">        shape_size (int): Size of the disk.</span>
+<span class="sd">        background (tuple, optional): RGB color for the background, by default (0, 0, 0).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        SE (numpy.ndarray): The generated flat SE.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        SE = Construct_disk_SE((L, a, b), 9, 9, (255, 255, 255))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create an array of NaN values</span>
+    <span class="n">SE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">shape_size</span><span class="p">,</span> <span class="n">shape_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">background</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># Calculate the center of the square</span>
+    <span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">shape_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Fill the disk region with the specified Value</span>
+    <span class="n">cv2</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="n">SE</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">size_of_SE</span><span class="p">,</span> <span class="n">Value</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">SE</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

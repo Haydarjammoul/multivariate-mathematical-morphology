@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rgb_math_morphology_tools module &mdash; MMM  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="synthesize module" href="synthesize.html" />
+    <link rel="prev" title="pretreatment module" href="pretreatment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MMM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">lib</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="order.html">order module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pretreatment.html">pretreatment module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rgb_math_morphology_tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthesize.html">synthesize module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">lib</a></li>
+      <li class="breadcrumb-item active">rgb_math_morphology_tools module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rgb_math_morphology_tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-rgb_math_morphology_tools">
+<span id="rgb-math-morphology-tools-module"></span><h1>rgb_math_morphology_tools module<a class="headerlink" href="#module-rgb_math_morphology_tools" title="Permalink to this heading"></a></h1>
+<p>Created on Mon Jul  3 13:01:28 2023</p>
+<p>&#64;author: hjammoul
+RGB_MorphoMath_tools
+Dilation &amp; erosion_rgb perform ordering usuch as lower is closest to O- and higher closest to O+
+CRA_dilation and erosion (allow idempotence &amp; duality) perform ordering based on both convergence coordinates
+opening &amp; closing
+Extension_of_convergence_points: choose ur colors and it makes them more distant to prevent saturation
+and ensure the transformations are increasing
+Ensure_convegence: to prevent divergence and thus ensure the tansformations are increasing</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.closing">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">closing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SE_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#closing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.closing" title="Permalink to this definition"></a></dt>
+<dd><p>Performs closing on an RGB image using a structuring element (SE).</p>
+<p>Closing is a morphological operation that first dilates the input image using the specified structuring element,
+followed by an erosion operation. It helps to close small dark gaps while preserving the larger structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>SE_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the closing operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.cmomp">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">cmomp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">su_sup_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#cmomp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.cmomp" title="Permalink to this definition"></a></dt>
+<dd><p>Performs the Color Space Morphological Opening and Morphological Processing (CMOMP) on an RGB image
+using structuring elements (SEs).</p>
+<p>CMOMP is a morphological operation that computes the difference between an anti-dilated image and an eroded image
+using two different structuring elements. It is useful for detecting and enhancing fine structures in color images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_inf_lab</strong> (<em>numpy.ndarray</em>) – The structuring element for erosion in LAB space.</p></li>
+<li><p><strong>su_sup_lab</strong> (<em>numpy.ndarray</em>) – The structuring element for anti-dilation in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the CMOMP result, the anti-dilated image,
+and the eroded image in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.construct_linear_se_flat">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">construct_linear_se_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#construct_linear_se_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.construct_linear_se_flat" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an array of size (3, 3, 3).
+Represents a simple horizontal line with the specified Value.
+:param Value: CIE lab coordinates as a numpy array (e.g., np.array([L, a, b]))
+:type Value: numpy.ndarray
+:param shape_size: Size of the linear SE (should be odd).
+:type shape_size: int</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>SE</strong> – Flat linear SE of shape (3, 3, 3).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.construct_round_se_flat">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">construct_round_se_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_of_SE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#construct_round_se_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.construct_round_se_flat" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a flat linear structuring element (SE) as an array of size (3, 3, 3).
+The SE represents a simple horizontal line with pixel values equal to Value in LAB space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Value</strong> (<em>numpy.ndarray</em>) – CIE LAB coordinates as a numpy array (e.g., np.array([L, a, b])).</p></li>
+<li><p><strong>shape_size</strong> (<em>int</em>) – Size of the linear SE (should be odd).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flat linear SE of specified shape in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.construct_square_se_flat">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">construct_square_se_flat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_of_SE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#construct_square_se_flat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.construct_square_se_flat" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a flat structuring element (SE) as an array of size size_of_SE * size_of_SE.
+The SE is a square with pixel values equal to Value in LAB space, and pixels not part of the square are assigned as NaN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Value</strong> (<em>numpy.ndarray</em>) – CIE LAB coordinates as a numpy array (e.g., np.array([L, a, b])).</p></li>
+<li><p><strong>size_of_SE</strong> (<em>int</em>) – Size of the square SE.</p></li>
+<li><p><strong>shape_size</strong> (<em>int</em>) – Size of the square within the SE.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Flat SE with specified size and shape in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.cra_anti_dilation_rgb">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">cra_anti_dilation_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#cra_anti_dilation_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.cra_anti_dilation_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Performs Anti-dilation on an RGB image using a structuring element (SE).</p>
+<p>Anti-dilation is a morphological operation that dilates towards the O- color convergence point the shapes in an image by considering the local neighborhood
+around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the
+maximum values of the pixel colors within the SE, displacing the colors towards O- (black).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space (dtype: float32).</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space (dtype: float32).</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The anti-dilated image after applying the anti-dilation operation in LAB space (dtype: float32).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.cra_dilation_rgb">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">cra_dilation_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#cra_dilation_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.cra_dilation_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Performs dilation on an RGB image using a structuring element (SE). Performs erosion on an RGB image using a structuring element (SE). Ordering based on CRA</p>
+<p>Dilation is a morphological operation that expands the shapes in an image by considering the local neighborhood
+around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the
+maximum values of the pixel colors within the SE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dilated image after applying the dilation operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p>Example:
+&gt;&gt;&gt; img_lab = np.array(…)  # Replace with your LAB image
+&gt;&gt;&gt; se_lab = np.array(…)   # Replace with your LAB SE
+&gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])
+&gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])
+&gt;&gt;&gt; dilated_image = dilation_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</p>
+<blockquote>
+<div><p># Now ‘dilated_image’ contains the result of the dilation operation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.cra_erosion_rgb">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">cra_erosion_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#cra_erosion_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.cra_erosion_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Performs erosion on an RGB image using a structuring element (SE). Ordering based on CRA</p>
+<p>Erosion is a morphological operation that shrinks the shapes in an image by considering the local neighborhood
+around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the
+minimum values of the pixel colors within the SE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The eroded image after applying the erosion operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p>Example:
+&gt;&gt;&gt; img_lab = np.array(…)  # Replace with your LAB image
+&gt;&gt;&gt; se_lab = np.array(…)   # Replace with your LAB SE
+&gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])
+&gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])
+&gt;&gt;&gt; eroded_image = erosion_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</p>
+<blockquote>
+<div><p># Now ‘eroded_image’ contains the result of the erosion operation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.csomp">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">csomp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#csomp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.csomp" title="Permalink to this definition"></a></dt>
+<dd><p>Performs the Color Space Opening by Morphological Processing (CSOMP) on an RGB image using a structuring element (SE).</p>
+<p>CSOMP is a morphological operation that computes the difference between an anti-dilated image and an eroded image
+using the specified structuring element. It is useful for detecting and enhancing fine structures in color images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the CSOMP result, the anti-dilated image,
+and the eroded image in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.dilation_rgb">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">dilation_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#dilation_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.dilation_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Performs dilation on an RGB image using a structuring element (SE).</p>
+<p>Dilation is a morphological operation that expands the shapes in an image by considering the local neighborhood
+around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the
+maximum values of the pixel colors within the SE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The dilated image after applying the dilation operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p>Example:
+&gt;&gt;&gt; img_lab = np.array(…)  # Replace with your LAB image
+&gt;&gt;&gt; se_lab = np.array(…)   # Replace with your LAB SE
+&gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])
+&gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])
+&gt;&gt;&gt; dilated_image = dilation_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</p>
+<blockquote>
+<div><p># Now ‘dilated_image’ contains the result of the dilation operation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.erosion_rgb">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">erosion_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">se_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#erosion_rgb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.erosion_rgb" title="Permalink to this definition"></a></dt>
+<dd><p>Performs erosion on an RGB image using a structuring element (SE).</p>
+<p>Erosion is a morphological operation that shrinks the shapes in an image by considering the local neighborhood
+around each pixel and comparing it with the corresponding elements of the SE. The resulting image represents the
+minimum values of the pixel colors within the SE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_lab</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>se_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The eroded image after applying the erosion operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p>Example:
+&gt;&gt;&gt; img_lab = np.array(…)  # Replace with your LAB image
+&gt;&gt;&gt; se_lab = np.array(…)   # Replace with your LAB SE
+&gt;&gt;&gt; O_inf_lab = np.array([32.29567432, 79.18557525, -107.85729885])
+&gt;&gt;&gt; O_sup_lab = np.array([100.0, -0.00244379, 0.00466108])
+&gt;&gt;&gt; eroded_image = erosion_rgb(img_lab, se_lab, O_inf_lab, O_sup_lab)</p>
+<blockquote>
+<div><p># Now ‘eroded_image’ contains the result of the erosion operation.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.extend_convergence_pts">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">extend_convergence_pts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#extend_convergence_pts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.extend_convergence_pts" title="Permalink to this definition"></a></dt>
+<dd><p>Extends the convergence points O_sup_lab and O_inf_lab based on a structuring element (SE).
+The extension is performed to prevent saturation, and the new points are calculated along the direction
+of the translation indicated by the SE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the upper convergence point.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the lower convergence point.</p></li>
+<li><p><strong>SE</strong> (<em>numpy.ndarray</em>) – Structuring element used to determine the extension direction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the new upper convergence point,
+the new lower convergence point, and the distance between them.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[numpy.ndarray, numpy.ndarray, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.extract_se_from_img">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">extract_se_from_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">posy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_se</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#extract_se_from_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.extract_se_from_img" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts a rectangular structuring element (SE) from an LAB image located at position (posx, posy).
+The SE is a rectangle with the specified size, and pixels outside the rectangle are assigned the background_value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img</strong> (<em>numpy.ndarray</em>) – LAB image from which to extract the SE.</p></li>
+<li><p><strong>posx</strong> (<em>int</em>) – X-coordinate of the SE’s center.</p></li>
+<li><p><strong>posy</strong> (<em>int</em>) – Y-coordinate of the SE’s center.</p></li>
+<li><p><strong>size_se</strong> (<em>int</em>) – Size of the rectangular SE.</p></li>
+<li><p><strong>background_value</strong> (<em>numpy.ndarray</em>) – CIE LAB coordinates for pixels outside the SE.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Extracted SE in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rgb_math_morphology_tools.opening">
+<span class="sig-prename descclassname"><span class="pre">rgb_math_morphology_tools.</span></span><span class="sig-name descname"><span class="pre">opening</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SE_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_inf_lab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O_sup_lab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rgb_math_morphology_tools.html#opening"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rgb_math_morphology_tools.opening" title="Permalink to this definition"></a></dt>
+<dd><p>Performs morphological opening on an RGB image using a structuring element (SE).</p>
+<p>Opening is a morphological operation that first erodes the input image using the specified structuring element,
+followed by a dilation operation. It helps to remove small bright spots while preserving the larger structures.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> (<em>numpy.ndarray</em>) – The input image in LAB space.</p></li>
+<li><p><strong>SE_lab</strong> (<em>numpy.ndarray</em>) – The structuring element (SE) in LAB space.</p></li>
+<li><p><strong>O_inf_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O-.</p></li>
+<li><p><strong>O_sup_lab</strong> (<em>numpy.ndarray</em>) – LAB coordinates of the color convergence point O+.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of the opening operation in LAB space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pretreatment.html" class="btn btn-neutral float-left" title="pretreatment module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="synthesize.html" class="btn btn-neutral float-right" title="synthesize module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Hjammoul.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
