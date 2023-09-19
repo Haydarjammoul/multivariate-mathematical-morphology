@@ -18,8 +18,10 @@ Functions:
 """
 import numpy as np
 from skimage import io, color
-from Order import CRA_median
-from rgb_math_morphology_tools import construct_round_SE_flat, construct_square_SE_flat,construct_linear_SE_flat
+
+
+from lib.order import cra_median
+from lib.rgb_math_morphology_tools import construct_round_se_flat, construct_square_se_flat,construct_linear_se_flat
 ####################""""
 def reflectivity(se):
     """

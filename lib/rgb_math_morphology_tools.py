@@ -13,9 +13,10 @@ Ensure_convegence: to prevent divergence and thus ensure the tansformations are 
 """
 
 import numpy as np
-from order import compute_distance_map, ordering_fct_inf,ordering_fct_sup,cra_sup, cra_inf, compute_distance_lab_img
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+from lib.order import compute_distance_map, ordering_fct_inf,ordering_fct_sup,cra_sup, cra_inf, compute_distance_lab_img
 ###########################################################
 
 def erosion_rgb(img_lab, se_lab,  O_inf_lab,O_sup_lab):
@@ -294,7 +295,7 @@ def cra_dilation_rgb(img_lab, se_lab,  O_inf_lab,O_sup_lab):
                 displacement_vector = np.multiply(normalized_displacement.astype(np.float32), se_magnitude_reshaped)
                 displaced_mask = displacement_vector + mask
                 #Compute distance maps and do the ordering to 
-                max_dist_idx = CRA_sup(displaced_mask, O_sup_lab, O_inf_lab, nan_mask)
+                max_dist_idx = cra_sup(displaced_mask, O_sup_lab, O_inf_lab, nan_mask)
                 # Update the eroded image with the chosen pixel value
             dilated_image[i, j, :] = displaced_mask[max_dist_idx[0], max_dist_idx[1], :]
     return dilated_image.astype(np.float32)
@@ -445,11 +446,11 @@ def cmomp(img_lab, se_inf_lab, su_sup_lab,  O_inf_lab,O_sup_lab):
     
     from pretreatment import reflectivity
     #Eroded image with se structuring element
-    eroded = CRA_erosion_rgb(img_lab, se_inf_lab,  O_inf_lab,O_sup_lab)
+    eroded = cra_erosion_rgb(img_lab, se_inf_lab,  O_inf_lab,O_sup_lab)
     #Anti-dilate with Refelectivity of se
     #se = reflectivity(se_lab)
     su_sup_lab = su_sup_lab[:,::-1,:]
-    anti_dilated = CRA_anti_dilation_rgb(img_lab, su_sup_lab,  O_inf_lab,O_sup_lab)
+    anti_dilated = cra_anti_dilation_rgb(img_lab, su_sup_lab,  O_inf_lab,O_sup_lab)
     #CSOMP=Anti_dilation - Erosion
     CMOMP = compute_distance_lab_img(anti_dilated,eroded)
     return CMOMP, anti_dilated,eroded
