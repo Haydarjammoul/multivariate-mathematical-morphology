@@ -397,6 +397,12 @@ def closing(value, SE_lab, O_inf_lab, O_sup_lab):
     closed_closed_value = cra_erosion_rgb(closed_value, SE_lab, O_inf_lab, O_sup_lab)
     return closed_closed_value
 
+def open_close_open_filter(value, SE_lab, O_inf_lab, O_sup_lab):
+    opened = opening(value, SE_lab, O_inf_lab, O_sup_lab)
+    closed_opened = closing(opened, SE_lab, O_inf_lab, O_sup_lab)
+    opene_close_opened_lab = opening(closed_opened, SE_lab, O_inf_lab, O_sup_lab)
+    return opene_close_opened_lab
+
 def csomp(img_lab, se_lab,  O_inf_lab,O_sup_lab):
     """
     Performs the Color Space Opening by Morphological Processing (CSOMP) on an RGB image using a structuring element (SE).
@@ -414,7 +420,7 @@ def csomp(img_lab, se_lab,  O_inf_lab,O_sup_lab):
         Tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray]: A tuple containing the CSOMP result, the anti-dilated image,
         and the eroded image in LAB space.
     """
-    from pretreatment import reflectivity
+    from lib.pretreatment import reflectivity
     #Eroded image with se structuring element
     eroded = cra_erosion_rgb(img_lab, se_lab,  O_inf_lab,O_sup_lab)
     #Anti-dilate with Refelectivity of se
@@ -444,7 +450,7 @@ def cmomp(img_lab, se_inf_lab, su_sup_lab,  O_inf_lab,O_sup_lab):
         and the eroded image in LAB space.
     """
     
-    from pretreatment import reflectivity
+    from lib.pretreatment import reflectivity
     #Eroded image with se structuring element
     eroded = cra_erosion_rgb(img_lab, se_inf_lab,  O_inf_lab,O_sup_lab)
     #Anti-dilate with Refelectivity of se

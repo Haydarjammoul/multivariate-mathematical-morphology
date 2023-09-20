@@ -338,7 +338,7 @@ def get_slice(image_file, z):
     slice_image_rgb = image[z,:, :, :] ###ype is unint16
     return slice_image_rgb.astype(np.int32)
 
-def construct_disk_SE(Value, size_of_SE, shape_size, background=(0,0,0)):
+def construct_disk_se(Value, size_of_SE, shape_size, background=(0,0,0)):
     """
     Create a flat structuring element (SE) in the shape of a disk.
 
